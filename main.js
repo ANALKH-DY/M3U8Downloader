@@ -2,6 +2,7 @@
 var m3u8Input = document.getElementById("m3u8url");
 var m3u8ContextInput = document.getElementById("m3u8Context");
 var baseUrlInput = document.getElementById("baseurl");
+var progressSpan = document.getElementById("progress");
 // m3u8内容
 let m3u8FileContext = "";
 let baseUrl = "";
@@ -53,38 +54,50 @@ async function onDownloadTsBtnClick() {
     console.log(`ts count:${urlCount}`);
     let fileNameLength = `${urlCount}`.length;
     downloadKey();
-    let tasks = [];
+
+    const arrayBuffers = [];
     for (let i = 0; i < urls.length; i++) {
-        await downloadTs(urls[i],i,urlCount, fileNameLength);
-        
-        // tasks.push((function (url, i, length) {
-        //     return new Promise((reslove, reject) => {
-        //         downloadTs(url, i, urlCount).then((ts) => saveTsFile(ts, i + 1, length).then(reslove('')));
-        //     })
-        // })(urls[i], i, length));
+        await downloadTs(urls[i],i,urlCount, fileNameLength,arrayBuffers);
+        progressSpan.innerHTML = `${(i / urls.length * 100).toFixed(2)}%`;
     }
-    console.log(tasks);
-    Promise.all(tasks).then(() => {
-        console.log('下载完毕');
-    })
-    // downloadTss();
+    let mergedBuffer = mergeArrayBuffers(arrayBuffers);
+    console.log(mergedBuffer);
+    downloadFile(new Blob([mergedBuffer]),"download.mp4");
+
+    console.log('下载完毕');
 };
 
-async function downloadTss() {
-    let length = `${tss.length}`.length;
-    for (var i = 0; i < tss.length; i++) {
-        await saveTsFile(tss[i], i + 1, length);
+function mergeArrayBuffers(arrayBuffers) {
+    // 计算新的ArrayBuffer的总长度
+    let totalLength = 0;
+    for (const buffer of arrayBuffers) {
+      totalLength += buffer.byteLength;
     }
-    tss.length = 0;
-}
+  
+    // 创建一个新的ArrayBuffer
+    const mergedBuffer = new ArrayBuffer(totalLength);
+  
+    // 创建一个Uint8Array以便操作新的ArrayBuffer
+    const uint8Array = new Uint8Array(mergedBuffer);
+  
+    let offset = 0;
+    // 逐个复制ArrayBuffer到新的ArrayBuffer中
+    for (const buffer of arrayBuffers) {
+      const sourceArray = new Uint8Array(buffer);
+      uint8Array.set(sourceArray, offset);
+      offset += sourceArray.length;
+    }
+  
+    return mergedBuffer;
+  }
 
-async function downloadTs(url, index, total,fileNameLength) {
+async function downloadTs(url, index, total,fileNameLength, arrayBuffers) {
 
     return new Promise((resolve, reject) => {
         fetch(baseUrl + url).then((res) => res.blob()).then(async (data) => {
-            // tss.push(data);
             console.log(`downloaded ts from url:${baseUrl + url},size:${data.size}, ${index}/${total}`);
-            await saveTsFile(data,index+1,fileNameLength);
+            let buffer = await data.arrayBuffer();
+            arrayBuffers.push(buffer);
             resolve(data);
         })
     })
@@ -97,17 +110,18 @@ async function saveTsFile(blob, index, length) {
         let fileName = ("" + index).padStart(length, "0");
         console.log(`保存文件 ${fileName}.ts`);
         // let file = new Blob([context],{type:"video/mp2t"});
-        const a = document.createElement("a");
-        const objectUrl = URL.createObjectURL(blob);
-        a.href = objectUrl;
-        a.download = `${fileName}.ts`;
-        a.click();
-        URL.revokeObjectURL(objectUrl);
-        setTimeout(() => {
-            reslove('');
-        }, 100)
+        downloadFile(blob, fileName);
     })
 
+}
+
+function downloadFile(blob, fileName){
+    const a = document.createElement("a");
+    const objectUrl = URL.createObjectURL(blob);
+    a.href = objectUrl;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(objectUrl);
 }
 
 function getBaseUrl(url){
