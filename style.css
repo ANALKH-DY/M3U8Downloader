@@ -19,3 +19,6 @@ html,body{
     display: block;
     width: 100%;
 }
+#progress {
+    margin-left: 10px;
+}
