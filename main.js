@@ -40,6 +40,7 @@ function onGetM3U8BtnClick(e) {
 }
 
 async function onDownloadTsBtnClick() {
+    progressSpan.innerHTML = `下载中……`;
     let urls = [];
     w = /#EXTINF:(\d*(?:\.\d+)?)(?:,(.*)\s+)(\S*)?/g;
     for (var i = w.lastIndex; null != (o = w.exec(m3u8FileContext));) {
@@ -58,7 +59,7 @@ async function onDownloadTsBtnClick() {
     const arrayBuffers = [];
     for (let i = 0; i < urls.length; i++) {
         await downloadTs(urls[i],i,urlCount, fileNameLength,arrayBuffers);
-        progressSpan.innerHTML = `${(i / urls.length * 100).toFixed(2)}%`;
+        progressSpan.innerHTML = `下载中……${((i+1) / urls.length * 100).toFixed(2)}%`;
     }
     let mergedBuffer = mergeArrayBuffers(arrayBuffers);
     console.log(mergedBuffer);
@@ -94,7 +95,10 @@ function mergeArrayBuffers(arrayBuffers) {
 async function downloadTs(url, index, total,fileNameLength, arrayBuffers) {
 
     return new Promise((resolve, reject) => {
-        fetch(baseUrl + url).then((res) => res.blob()).then(async (data) => {
+        fetch(baseUrl + url,{
+            method: 'GET',
+            mode: 'cors',
+        }).then((res) => res.blob()).then(async (data) => {
             console.log(`downloaded ts from url:${baseUrl + url},size:${data.size}, ${index}/${total}`);
             let buffer = await data.arrayBuffer();
             arrayBuffers.push(buffer);
@@ -140,10 +144,10 @@ async function downloadKey() {
     let attr = new AttrList(o[2]);
     let keyUrl = attr.URI;
     let iv = attr.IV;
-    if (keyUrl && keyUrl.length > 0 && keyUrl.indexOf("http") != 0 && keyUrl.includes(".key")) {
+    if (keyUrl && keyUrl.length > 0 && keyUrl.indexOf("http") != 0) {
         if (keyUrl[0] === '/') keyUrl = keyUrl.slice(1);
         keyUrl = baseUrl + keyUrl;
     }
-    window.open(keyUrl);
+    window.open(keyUrl,"_self");
     console.log(`key downloaded from ${keyUrl}`);
 }
