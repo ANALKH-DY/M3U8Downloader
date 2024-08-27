@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3U8 Downloader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="line-input">
+        <label for="m3u8url">请输入m3u8文件url</label>
+        <!-- <textarea type="text" name="m3u8url" id="m3u8url" >https://video.acwing.com/04e3bb97006545a6ae8e8b7b5862cea1/feff7e4a5dfb4dddaf1cb7fa09a9bf7b-982dd9d00800dd0173451d46801127bf-od-S00000001-100000-encrypt-stream.m3u8?auth_key=1712073286-null-null-6938fab72db801c8ada41a6f67596810</textarea> -->
+        <textarea type="text" name="m3u8url" id="m3u8url" ></textarea>
+    </div>
+    <div class="line-input">
+        <label for="m3u8Context">m3u8内容</label>
+        <textarea type="text" name="m3u8Context" id="m3u8Context" rows="10"></textarea>
+    </div>
+    <div class="line-input">
+        <label for="baseurl">BaseUrl</label>
+        <textarea type="text" name="baseurl" id="baseurl" rows="3"></textarea>
+    </div>
+    <button id="getM3U8Btn" onclick="onGetM3U8BtnClick()">获取m3u8</button>
+    <button id="downloadTsBtn" onclick="onDownloadTsBtnClick()">下载视频</button>
+    <script src="attrlist.js" type="text/javascript"></script>
+    <script src="main.js"></script>
+</body>
+</html>
