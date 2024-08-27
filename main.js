@@ -15,7 +15,7 @@ var tss = [];
     baseUrlInput.addEventListener("input", function (e) {
         baseUrl = baseUrlInput.value;
     })
-    m3u8Input.value = "https://cdn77-vid.xvideos-cdn.com/H4bk_OWgoc7xFUcjk5Oc2Q==,1724779997/videos/hls/2a/3f/fd/2a3ffdaf8c5c5d86560d7da3a66cb802/hls-1080p-cbc05.m3u8";
+    m3u8Input.value = "";
     baseUrlInput.value = ""
     // onGetM3U8BtnClick();
 }();
